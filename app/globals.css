@@ -1,26 +1,457 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ══════════════════════════════════════════════════════════════════════════
+   MODERNIST — design tokens
+   Ported verbatim from the Modernist token sheet in design/_ds/.
+   Everything below is exposed to Tailwind through `@theme`, so a token is
+   reachable both as a utility (`bg-accent`, `text-lead`, `px-edge`) and as a
+   raw custom property (`var(--color-accent)`), and there is exactly one place
+   to retune the system.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ── Reset Tailwind's stock palette ─────────────────────────────────────
+     The system is strict on purpose: only Modernist roles resolve, so a stray
+     `text-blue-500` fails loudly instead of quietly leaving the system. */
+  --color-*: initial;
+
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* ── Roles ─────────────────────────────────────────────────────────────
+     The accent is the one role that deliberately departs from the Modernist
+     sheet in design/_ds/: the vermilion is re-hued to a signal blue, which
+     reads as engineering rather than alarm and sits calmer on the warm ground
+     while the ink, surface and divider roles stay untouched.
+
+     It is also set considerably darker than the vermilion it replaces — OKLCH
+     L 0.49 rather than 0.61 — because the ground is light and the accent has
+     to work as ink as often as it works as a field. That buys 6.0:1 against
+     the page and 5.5:1 against the surface, clearing AA for body-sized text,
+     where the original 3.76:1 cleared nothing. */
+  --color-bg: #f3f2f2;
+  --color-surface: #eae9e9;
+  --color-text: #201e1d;
+  --color-accent: #1d4ed8;
+  --color-accent-2: #345fc9;
+  --color-divider: color-mix(in srgb, #201e1d 40%, transparent);
+
+  /* ── Tonal ramps ─────────────────────────────────────────────────────────
+     Generated in OKLCH on one shared lightness scale, so the same step of any
+     role matches the others in visual value. The accent ramps hold the source
+     sheet's lightness per step and move only in hue and in a single chroma
+     factor — the whole ramp is pulled to the brand blue's own saturation — so
+     every step keeps roughly the contrast it was designed with (accent-700
+     against the ground is 6.1:1 here against the vermilion's 6.4:1).
+
+     The base role now lands *on* step 700 rather than between 500 and 600
+     where the vermilion sat, which inverts the interaction chain: the accent
+     is already the deep tone, so a control on an accent field darkens to
+     800/900 (see the primary button and the scrollbar thumb) and accent ink on
+     the light ground brightens to 600 on hover, instead of both stepping one
+     rung the other way. */
+  --color-neutral-100: #f8f4f4;
+  --color-neutral-200: #eae7e7;
+  --color-neutral-300: #d7d3d3;
+  --color-neutral-400: #bab6b6;
+  --color-neutral-500: #9b9797;
+  --color-neutral-600: #7d7979;
+  --color-neutral-700: #605d5d;
+  --color-neutral-800: #444141;
+  --color-neutral-900: #2d2b2b;
+
+  --color-accent-100: #f1f6ff;
+  --color-accent-200: #dde8ff;
+  --color-accent-300: #bfd5ff;
+  --color-accent-400: #94b6ff;
+  --color-accent-500: #6393ff;
+  --color-accent-600: #366df9;
+  --color-accent-700: #2552c5;
+  --color-accent-800: #1a3a8c;
+  --color-accent-900: #162955;
+
+  --color-accent-2-100: #f1f6ff;
+  --color-accent-2-200: #dde8ff;
+  --color-accent-2-300: #bfd5ff;
+  --color-accent-2-400: #94b6ff;
+  --color-accent-2-500: #6393ff;
+  --color-accent-2-600: #4874db;
+  --color-accent-2-700: #3458ae;
+  --color-accent-2-800: #243e7c;
+  --color-accent-2-900: #1a2a4d;
+
+  /* Ink tints — the design file writes body copy and hairlines as
+     `color-mix(in srgb, var(--color-text) N%, transparent)`. Tailwind's
+     opacity modifier resolves to the same rgba, so those are written as
+     `text-text/78`, `bg-text/4`, `bg-text/15` at the call site rather than as
+     a parallel set of tokens. */
+
+  /* ── Type families ───────────────────────────────────────────────────────
+     Wired to the `next/font` CSS variables declared in app/[lang]/layout.tsx,
+     with the design file's stack as the fallback. */
+  --font-heading: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --font-body: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --font-weight-heading: 800;
+
+  /* ── Type scale ──────────────────────────────────────────────────────────
+     Named by role, valued exactly as the design file has them. Fluid steps
+     keep their original clamp() so the type ramps identically at every width.
+     `--text-x--line-height` / `--text-x--letter-spacing` ride along with the
+     size, so `text-hero` carries its leading and tracking for free. */
+
+  /* Display */
+  --text-hero: clamp(44px, 8.4vw, 120px);
+  --text-hero--line-height: 0.95;
+  --text-hero--letter-spacing: -0.035em;
+
+  --text-poster: clamp(38px, 7vw, 108px);
+  --text-poster--line-height: 1.03;
+  --text-poster--letter-spacing: -0.035em;
+
+  --text-menu: clamp(34px, 9vw, 60px);
+  --text-menu--line-height: 1.06;
+  --text-menu--letter-spacing: -0.03em;
+
+  /* Section titles — one token per section that owns a distinct step */
+  --text-title-services: clamp(32px, 4.4vw, 64px);
+  --text-title-services--line-height: 1.06;
+  --text-title-services--letter-spacing: -0.03em;
+
+  --text-title-cases: clamp(26px, 4.2vw, 60px);
+  --text-title-cases--line-height: 1.06;
+  --text-title-cases--letter-spacing: -0.03em;
+
+  --text-title-process: clamp(30px, 3.8vw, 54px);
+  --text-title-process--line-height: 1.06;
+  --text-title-process--letter-spacing: -0.03em;
+
+  --text-title-section: clamp(28px, 3.6vw, 50px);
+  --text-title-section--line-height: 1.06;
+  --text-title-section--letter-spacing: -0.03em;
+
+  --text-title-faq: clamp(26px, 3.2vw, 44px);
+  --text-title-faq--line-height: 1.06;
+  --text-title-faq--letter-spacing: -0.03em;
+
+  /* Numerals */
+  --text-stat: clamp(38px, 4.6vw, 62px);
+  --text-stat--line-height: 1.05;
+  --text-stat--letter-spacing: -0.03em;
+
+  --text-step-num: clamp(30px, 3.4vw, 44px);
+  --text-step-num--line-height: 1;
+  --text-step-num--letter-spacing: -0.03em;
+
+  --text-case-num: clamp(38px, 9vh, 64px);
+  --text-case-num--line-height: 1;
+  --text-case-num--letter-spacing: -0.04em;
+
+  /* Sub-heads */
+  --text-plan-title: clamp(22px, 2.2vw, 30px);
+  --text-plan-title--line-height: 1.12;
+  --text-plan-title--letter-spacing: -0.025em;
+
+  --text-step-title: clamp(20px, 2vw, 26px);
+  --text-step-title--line-height: 1.12;
+  --text-step-title--letter-spacing: -0.02em;
+
+  --text-service-title: 23px;
+  --text-service-title--line-height: 1.12;
+  --text-service-title--letter-spacing: -0.02em;
+
+  --text-case-title: clamp(17px, 2.6vh, 21px);
+  --text-case-title--line-height: 1.18;
+  --text-case-title--letter-spacing: -0.02em;
+
+  --text-faq-q: clamp(17px, 1.6vw, 21px);
+  --text-faq-q--line-height: 1.2;
+  --text-faq-q--letter-spacing: -0.015em;
+
+  --text-post-title: 20px;
+  --text-post-title--line-height: 1.2;
+  --text-post-title--letter-spacing: -0.02em;
+
+  --text-case-metric: clamp(15px, 2.4vh, 17px);
+  --text-case-metric--line-height: 1.2;
+  --text-case-metric--letter-spacing: -0.02em;
+
+  /* Brand */
+  --text-brand: 19px;
+  --text-brand--line-height: 1.1;
+  --text-brand--letter-spacing: -0.02em;
+
+  --text-brand-sm: 15px;
+  --text-brand-sm--line-height: 1.1;
+  --text-brand-sm--letter-spacing: -0.02em;
+
+  --text-logo: clamp(15px, 1.5vw, 19px);
+  --text-logo--line-height: 1.1;
+  --text-logo--letter-spacing: -0.02em;
+
+  /* Body */
+  --text-lead: 17.5px;
+  --text-lead--line-height: 1.65;
+
+  --text-body-lg: 16.5px;
+  --text-body-lg--line-height: 1.68;
+
+  --text-body: 16px;
+  --text-body--line-height: 1.65;
+
+  --text-body-sm: 15.5px;
+  --text-body-sm--line-height: 1.62;
+
+  --text-body-xs: 14.5px;
+  --text-body-xs--line-height: 1.6;
+
+  --text-case-body: clamp(13px, 2vh, 14.5px);
+  --text-case-body--line-height: 1.55;
+
+  --text-note: 13.5px;
+  --text-note--line-height: 1.6;
+
+  --text-fine: 13px;
+  --text-fine--line-height: 1.6;
+
+  /* Labels — uppercase, tracked. Tracking is the token's most common value;
+     the few one-off variants override it at the call site. */
+  --text-eyebrow: 13px;
+  --text-eyebrow--letter-spacing: 0.1em;
+
+  --text-nav: 12.5px;
+  --text-nav--letter-spacing: 0.09em;
+
+  --text-label: 12px;
+  --text-label--letter-spacing: 0.09em;
+
+  --text-kicker: 11.5px;
+  --text-kicker--letter-spacing: 0.1em;
+
+  --text-marquee: 15px;
+  --text-marquee--letter-spacing: 0.06em;
+
+  --text-tag: 11px;
+  --text-tag--letter-spacing: 0.02em;
+
+  --text-quote-mark: 44px;
+  --text-quote-mark--line-height: 0.7;
+
+  /* ── Spacing ─────────────────────────────────────────────────────────────
+     Base step is 4px, which reproduces Modernist's --space-1…--space-8
+     (4/8/12/16/24/32) as `1 2 3 4 6 8`. Named steps below are the design
+     file's fluid rhythms, kept as their original clamp()/calc(). */
+  --spacing: 4px;
+
+  --spacing-edge: clamp(20px, 5vw, 72px);
+  --spacing-hero-top: calc(64px + 6vw);
+  --spacing-reel-top: clamp(48px, 7vw, 96px);
+
+  --spacing-section: clamp(56px, 7vw, 96px);
+  --spacing-section-lg: clamp(56px, 7vw, 104px);
+  --spacing-section-sm: clamp(48px, 6vw, 88px);
+  --spacing-section-xl: clamp(64px, 9vw, 132px);
+  --spacing-section-end: clamp(40px, 5vw, 72px);
+
+  --spacing-gap-xl: clamp(32px, 5vw, 88px);
+  --spacing-gap-lg: clamp(28px, 4vw, 72px);
+  --spacing-gap-md: clamp(24px, 6vw, 96px);
+  --spacing-gap-sm: clamp(20px, 4vw, 64px);
+  --spacing-gap-xs: clamp(20px, 3vw, 48px);
+
+  --spacing-title-gap: clamp(32px, 4vw, 56px);
+  --spacing-title-gap-sm: clamp(28px, 3.5vw, 44px);
+
+  --spacing-case-media: clamp(108px, 21vh, 210px);
+  --spacing-card: clamp(14px, 2.4vh, 22px);
+  --spacing-card-gap: clamp(12px, 2vh, 18px);
+  --spacing-card-rule: clamp(10px, 1.7vh, 14px);
+  --spacing-card-title: clamp(8px, 1.6vh, 12px);
+  --spacing-quote: clamp(24px, 2.6vw, 34px);
+  --spacing-plan-x: clamp(20px, 2.4vw, 36px);
+  --spacing-logo-x: clamp(16px, 2vw, 28px);
+
+  /* Cases panel — vertical rhythm keyed to viewport height, as in the source */
+  --spacing-cases-top: clamp(76px, 10vh, 112px);
+  --spacing-cases-bottom: clamp(26px, 4vh, 44px);
+  --spacing-cases-eyebrow: clamp(12px, 2.2vh, 22px);
+  --spacing-cases-head: clamp(18px, 3.4vh, 34px);
+  --spacing-cases-gap: clamp(14px, 2vh, 24px);
+  --spacing-cases-prog: clamp(18px, 3vh, 30px);
+
+  /* ── Radius ──────────────────────────────────────────────────────────────
+     Zero on purpose — Modernist never rounds a corner. */
+  --radius-*: initial;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+
+  /* ── Elevation ───────────────────────────────────────────────────────────
+     Soft ink-tinted shadows tuned to the light ground. */
+  --shadow-*: initial;
+  --shadow-sm: 0 1px 2px color-mix(in srgb, #2d2b2b 14%, transparent);
+  --shadow-md: 0 3px 10px color-mix(in srgb, #2d2b2b 16%, transparent);
+  --shadow-lg: 0 12px 32px color-mix(in srgb, #2d2b2b 22%, transparent);
+
+  /* ── Layout ──────────────────────────────────────────────────────────── */
+  --container-page: 1440px;
+  --container-case: clamp(280px, 32vw, 420px);
+
+  /* ── Breakpoints ─────────────────────────────────────────────────────────
+     The design file switches layout in JS at 700 / 760 / 880 / 940 / 1040.
+     Those exact widths become the system's breakpoints so the CSS reproduces
+     the same behaviour declaratively. */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 700px;
+  --breakpoint-cases: 760px;
+  --breakpoint-md: 880px;
+  --breakpoint-nav: 940px;
+  --breakpoint-lg: 1040px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ══════════════════════════════════════════════════════════════════════════
+   Base layer
+   ══════════════════════════════════════════════════════════════════════════ */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-accent) var(--color-surface);
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    /* Modernist's base is 15px/1.55; the landing raises it to 16px/1.6 and
+       that is the value the design actually renders at. */
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 400;
+    text-wrap: pretty;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-heading);
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+  }
+
+  /* The base accent is itself the deep tone now, so a link reads in it and
+     brightens on hover — the same direction the vermilion moved in, which went
+     from accent-700 up to the base. */
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-accent-600);
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+
+  details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  ::-webkit-scrollbar {
+    width: 13px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-surface);
+    border-left: 2px solid var(--color-divider);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-top: 3px solid var(--color-surface);
+    border-bottom: 3px solid var(--color-surface);
+    border-left: 3px solid var(--color-surface);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent-800);
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    background: var(--color-accent-900);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ══════════════════════════════════════════════════════════════════════════
+   Utilities
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Every content photograph prints in pure black and white. */
+@utility grayscale-photo {
+  filter: grayscale(1) contrast(1.08);
+}
+
+/* The clipping window a masked heading line slides up through.
+
+   The padding is descender room. Archivo descends 0.210em, but the display
+   steps set leading as tight as 0.95 — which lands the line box's bottom edge
+   only 0.141em under the baseline, so `overflow: hidden` was shaving the tail
+   off a `g` or a `ç`. The padding drops the clip edge clear of the font's
+   descent; the matching negative margin takes the space straight back, so the
+   heading's line rhythm and total height are exactly what they were.
+
+   `SPLIT.fromYPercent` is what keeps the taller window empty before the line
+   rises into it — the two numbers have to move together. */
+@utility mask-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.18em;
+  margin-bottom: -0.18em;
+}
+
+/* Tabular figures — counters and slide numbers must not jitter as they tick. */
+@utility tnum {
+  font-feature-settings: "tnum" 1;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Motion pre-paint state
+   `data-fx` is stamped on <html> by a blocking inline script (see
+   app/[lang]/layout.tsx) only when scripting is on and the visitor has not
+   asked for reduced motion. Anything animated in starts hidden under that
+   flag, so there is no flash before GSAP takes over — and no permanently
+   invisible content when JS or motion is unavailable.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+[data-fx] [data-reveal] {
+  opacity: 0;
+}
+
+[data-fx] [data-split] {
+  visibility: hidden;
+}
+
+[data-fx] [data-stagger-item] {
+  opacity: 0;
 }
