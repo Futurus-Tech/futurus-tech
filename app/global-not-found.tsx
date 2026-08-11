@@ -3,7 +3,7 @@ import { cookies, headers } from "next/headers";
 
 import { ErrorHeader } from "@/components/layout/error-header";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { MotionFlag } from "@/components/motion/motion-flag";
+import { MotionFallback } from "@/components/motion/motion-fallback";
 import { NotFoundSection } from "@/components/sections/not-found-section";
 import { archivo } from "@/lib/fonts";
 import { LOCALE_COOKIE, LOCALE_TAG, type Locale } from "@/lib/i18n/config";
@@ -20,7 +20,7 @@ import "./globals.css";
  * `app/layout.tsx` for a root `not-found.tsx` to render inside, which is
  * exactly the case this convention exists for: it bypasses rendering entirely
  * and returns its own complete document, so the stylesheet, the font and the
- * pre-paint motion flag are all imported here.
+ * no-script motion fallback are all imported here.
  */
 
 /**
@@ -64,19 +64,13 @@ export default async function GlobalNotFound() {
   const dict = await getDictionary(locale);
 
   return (
-    // `suppressHydrationWarning` for the `data-fx` flag `MotionFlag` sets on
-    // this element pre-paint; see the same note in `app/[lang]/layout.tsx`.
-    <html
-      lang={LOCALE_TAG[locale]}
-      className={archivo.variable}
-      suppressHydrationWarning
-    >
+    <html lang={LOCALE_TAG[locale]} className={archivo.variable}>
       {/* Column layout so the footer sits at the bottom of the viewport on the
           tall screens where this short page would otherwise leave it floating.
           `SmoothScroll` is deliberately absent: there is nothing to scroll
           through, and a 404 should not pay for Lenis to find that out. */}
       <body className="flex min-h-[100svh] flex-col">
-        <MotionFlag />
+        <MotionFallback />
         <ErrorHeader dict={dict} locale={locale} />
         <NotFoundSection content={dict.notFound} nav={dict.nav} locale={locale} />
         <SiteFooter dict={dict} />

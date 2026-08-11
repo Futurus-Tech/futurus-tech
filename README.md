@@ -80,10 +80,12 @@ a timing regression shows up as a diff in that one file.
 `useGsapEffect` scopes each animation to its own element through `gsap.context`, and reverts it —
 tweens, ScrollTriggers and the inline styles GSAP wrote — on unmount.
 
-Motion is opt-out throughout: with `prefers-reduced-motion: reduce`, Lenis is never created and no
-effect is registered. A blocking inline script sets `data-fx` on `<html>` only when motion will
-actually run, which is what hides the animated-in elements before first paint without stranding
-them when JavaScript or motion is unavailable.
+Motion is opt-out throughout: with `prefers-reduced-motion: reduce`, Lenis is never created, no
+effect is registered, and the stylesheet never hides the animated-in elements in the first place.
+Under `prefers-reduced-motion: no-preference` they start hidden from the first paint, so there is no
+flash of the un-animated state, and `MotionFallback` renders a `<noscript>` rule that hands them
+back when scripting is off and GSAP will never run. No inline script, nothing injected into the
+document.
 
 ### Locales, geolocation and link previews
 

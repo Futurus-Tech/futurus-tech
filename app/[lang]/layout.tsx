@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { MotionFlag } from "@/components/motion/motion-flag";
+import { MotionFallback } from "@/components/motion/motion-fallback";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { archivo } from "@/lib/fonts";
 import { LOCALES, LOCALE_TAG, isLocale } from "@/lib/i18n/config";
@@ -38,18 +38,13 @@ export default async function RootLayout({
   if (!isLocale(lang)) notFound();
 
   return (
-    // `suppressHydrationWarning` because `MotionFlag` stamps `data-fx` on this
-    // element before the body is parsed. The attribute depends on the visitor's
-    // motion preference, which the server cannot know, so the markup React
-    // hydrates against will never carry it. Scoped to <html> only — React
-    // suppresses one level deep, so real mismatches below still surface.
-    <html
-      lang={LOCALE_TAG[lang]}
-      className={archivo.variable}
-      suppressHydrationWarning
-    >
+    // Nothing touches this element before hydration any more: the pre-paint
+    // motion state is a stylesheet rule now, so the server markup and the
+    // client's first render agree and no hydration warning has to be
+    // suppressed here.
+    <html lang={LOCALE_TAG[lang]} className={archivo.variable}>
       <body>
-        <MotionFlag />
+        <MotionFallback />
         <SmoothScroll />
         {children}
       </body>

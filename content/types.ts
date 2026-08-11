@@ -187,6 +187,8 @@ export type Dictionary = {
   readonly plans: SectionIntro & { readonly items: readonly Plan[] };
   readonly about: SectionIntro & {
     readonly paragraphs: readonly string[];
+    /** Label on the rule that opens the roster; the count beside it is derived. */
+    readonly teamLabel: string;
     readonly team: readonly TeamMember[];
   };
   readonly insights: SectionIntro & {

@@ -33,11 +33,23 @@ export const QUOTE_MEDIA = {
   "helena-prado": { src: "https://i.pravatar.cc/300?img=26", width: 300, height: 300 },
 } as const satisfies Record<string, MediaAsset>;
 
+/**
+ * Team portraits, the one set of real photography in the file.
+ *
+ * They live in `public/` rather than on a placeholder host, and their natural
+ * sizes differ from one another: the frame in the about section crops every
+ * one of them to the same 4:5 window, so what matters here is that `width` and
+ * `height` describe the file, not the slot it is rendered into.
+ *
+ * Adding a collaborator is one entry here plus one entry per locale. The grid
+ * reflows on its own, so no layout code has to change.
+ */
 export const TEAM_MEDIA = {
-  "gabriel-ferreira": { src: "https://i.pravatar.cc/800?img=12", width: 800, height: 800 },
-  "rafael-ruddy": { src: "https://i.pravatar.cc/800?img=33", width: 800, height: 800 },
-  "fabio-junior": { src: "https://i.pravatar.cc/800?img=59", width: 800, height: 800 },
-  "larissa-moreira": { src: "https://i.pravatar.cc/800?img=45", width: 800, height: 800 },
+  "ricardo-paje": { src: "/ricardo-paje.webp", width: 417, height: 560 },
+  "fabio-junior": { src: "/fabio-junior.webp", width: 420, height: 420 },
+  "gabriel-hermenegildo": { src: "/gabriel-hermenegildo.webp", width: 800, height: 800 },
+  "guido-sanchis": { src: "/guido-sanchis.webp", width: 800, height: 800 },
+  "rafael-ruddy": { src: "/rafael-ruddy.webp", width: 457, height: 457 },
 } as const satisfies Record<string, MediaAsset>;
 
 export type CaseId = keyof typeof CASE_MEDIA;

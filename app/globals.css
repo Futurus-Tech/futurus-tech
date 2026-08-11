@@ -442,21 +442,28 @@
 
 /* ══════════════════════════════════════════════════════════════════════════
    Motion pre-paint state
-   `data-fx` is stamped on <html> by a blocking inline script (see
-   app/[lang]/layout.tsx) only when scripting is on and the visitor has not
-   asked for reduced motion. Anything animated in starts hidden under that
-   flag, so there is no flash before GSAP takes over — and no permanently
-   invisible content when JS or motion is unavailable.
+   Anything animated in starts hidden, so there is no flash of the un-animated
+   state before GSAP takes over. Being a stylesheet rule rather than a flag an
+   inline script has to stamp, it is in force from the first paint and costs
+   the document no blocking script.
+
+   The gate is the motion preference, the same one `useGsapEffect` bails at:
+   a visitor who asked for reduced motion is never served the hidden state,
+   because nothing would ever animate it back. The other way motion can fail
+   to arrive, scripting being off, is not something CSS can ask about, so
+   `MotionFallback` answers it with a <noscript> override.
    ══════════════════════════════════════════════════════════════════════════ */
 
-[data-fx] [data-reveal] {
-  opacity: 0;
-}
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+  }
 
-[data-fx] [data-split] {
-  visibility: hidden;
-}
+  [data-split] {
+    visibility: hidden;
+  }
 
-[data-fx] [data-stagger-item] {
-  opacity: 0;
+  [data-stagger-item] {
+    opacity: 0;
+  }
 }

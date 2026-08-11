@@ -24,7 +24,7 @@ Read `node_modules/next/dist/docs/` before writing routing or config code. Conve
 
 - `proxy.ts` at the repo root is the middleware file. It matches `/` only.
 - `params` is a Promise in layouts, pages and `generateMetadata`, and must be awaited.
-- `app/global-not-found.tsx` renders its own complete `<html>` document, enabled by `experimental.globalNotFound` in `next.config.ts`. It exists because the root layout is `app/[lang]/layout.tsx`, a top-level dynamic segment, so there is no `app/layout.tsx` for a plain `not-found.tsx` to render inside. Anything global (stylesheet, font, `MotionFlag`) has to be added to both documents.
+- `app/global-not-found.tsx` renders its own complete `<html>` document, enabled by `experimental.globalNotFound` in `next.config.ts`. It exists because the root layout is `app/[lang]/layout.tsx`, a top-level dynamic segment, so there is no `app/layout.tsx` for a plain `not-found.tsx` to render inside. Anything global (stylesheet, font, `MotionFallback`) has to be added to both documents.
 
 Path alias: `@/*` maps to the repo root.
 
@@ -54,7 +54,7 @@ Animations go through `useGsapEffect` (`lib/motion/use-gsap-effect.ts`), which s
 
 ## Gotchas
 
-- **`data-fx`.** `MotionFlag` stamps `data-fx` on `<html>` from a blocking inline script when motion is allowed; CSS at the bottom of `globals.css` hides `[data-reveal]`, `[data-split]` and `[data-stagger-item]` under that flag so there is no flash before GSAP takes over. Anything animated in must carry one of those attributes, and every document rendering `MotionFlag` needs `suppressHydrationWarning` on its `<html>`.
+- **Pre-paint motion state.** CSS at the bottom of `globals.css` hides `[data-reveal]`, `[data-split]` and `[data-stagger-item]` under `@media (prefers-reduced-motion: no-preference)`, so there is no flash before GSAP takes over. Anything animated in must carry one of those attributes. `MotionFallback` renders the matching `<noscript>` override that reveals them when scripting is off; both documents render it. No inline script and no `dangerouslySetInnerHTML` anywhere in the app: do not reintroduce one for this.
 - **Reduced motion is opt-out at the entry point.** `useGsapEffect` bails and Lenis is never constructed under `prefers-reduced-motion: reduce`. Do not add an animation that runs outside that gate.
 - **`mask-line` and `SPLIT.fromYPercent` move together.** The utility's descender padding sets how far a masked heading line has to travel to clear its window; changing one without the other clips glyphs or reveals the line early.
 - **Remote images.** Placeholder photography points at `picsum.photos` and `i.pravatar.cc`, allowed through `images.remotePatterns` in `next.config.ts`. A new host needs an entry there.
