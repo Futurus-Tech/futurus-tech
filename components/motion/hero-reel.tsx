@@ -8,7 +8,8 @@ import { REEL_MEDIA } from "@/content/media";
 
 /**
  * The pinned hero reel: three frames wiping over one another while each one
- * pushes slowly in, driven by scroll over roughly three viewport heights.
+ * pushes slowly in and bleeds from black and white into colour, driven by
+ * scroll over roughly three viewport heights.
  *
  * Frames after the first start fully clipped from the bottom and open upward,
  * so the outgoing frame is never uncovered — the wipe reads as one image
@@ -47,13 +48,30 @@ export function HeroReel({
     gsap.set(frameEls, {
       scale: REEL.frame.fromScale,
       transformOrigin: REEL.frame.transformOrigin,
+      // Explicit, because a custom property that was never set computes to an
+      // empty string and GSAP would have no start value to interpolate from.
+      [REEL.frame.color.property]: REEL.frame.color.from,
     });
 
-    timeline.to(
-      frameEls[0],
-      { scale: REEL.frame.toScale, ease: EASE.none, duration: REEL.frame.pushDuration },
-      0,
-    );
+    /* Both built per call rather than shared: GSAP writes its own bookkeeping
+       into the vars object it is handed, so one object cannot back two tweens. */
+    const push = () => ({
+      scale: REEL.frame.toScale,
+      ease: EASE.none,
+      duration: REEL.frame.pushDuration,
+    });
+    /* Colour waits out the wipe, so a frame is fully open and still in black
+       and white before any of it drains, and then rides the rest of the
+       push-in. The first frame never wipes, but keeps the same schedule so all
+       three colour on one rhythm. */
+    const colorize = () => ({
+      [REEL.frame.color.property]: REEL.frame.color.to,
+      ease: EASE.none,
+      duration: REEL.frame.step - REEL.frame.wipe.duration,
+    });
+    const colorAt = (index: number) => index * REEL.frame.step + REEL.frame.wipe.duration;
+
+    timeline.to(frameEls[0], push(), 0).to(frameEls[0], colorize(), colorAt(0));
 
     for (let i = 1; i < frameEls.length; i += 1) {
       const at = i * REEL.frame.step;
@@ -73,11 +91,8 @@ export function HeroReel({
           },
           at,
         )
-        .to(
-          frameEls[i],
-          { scale: REEL.frame.toScale, ease: EASE.none, duration: REEL.frame.pushDuration },
-          at,
-        );
+        .to(frameEls[i], push(), at)
+        .to(frameEls[i], colorize(), colorAt(i));
     }
 
     if (caption) {

@@ -112,10 +112,37 @@ export const REEL = {
     fromScale: 1.22,
     toScale: 1.02,
     transformOrigin: "50% 55%",
-    pushDuration: 1.2,
-    /** Seconds of timeline between one frame wiping in and the next. */
-    step: 1.05,
+    /**
+     * Equal to `step` on purpose: the push-in spans a frame's entire life, so
+     * it is still moving when the next frame takes over and nothing ever sits
+     * frozen. The design's 1.2 was tied to the old 1.05 step.
+     */
+    pushDuration: 1.55,
+    /**
+     * Seconds of timeline between one frame wiping in and the next.
+     *
+     * The design's 1.05 left `step - wipe.duration` = 0.2s of frame that was
+     * not either arriving or being covered — fine for a reel that only wiped
+     * and pushed, but the grayscale drain needs somewhere to live. 1.55 gives
+     * it 0.7s.
+     */
+    step: 1.55,
     wipe: { duration: 0.85, ease: EASE.power2InOut },
+    /**
+     * Grayscale draining out of the frame, one pass per frame.
+     *
+     * It waits out the whole wipe, so the frame arrives as a black-and-white
+     * print and is fully open before any colour appears, then drains across the
+     * rest of the push-in and lands at full colour exactly as the next frame
+     * starts wiping over it. The cut always happens on a colour image, and the
+     * frame taking over restarts from the print. Hence the timing is derived,
+     * not declared: it starts at `wipe.duration` into the frame and runs for
+     * `step - wipe.duration`.
+     *
+     * Drives `--photo-grayscale`, read by the `grayscale-photo` utility;
+     * reverting the context restores the print.
+     */
+    color: { property: "--photo-grayscale", from: 1, to: 0 },
   },
   caption: { fromXPercent: -105, duration: 0.7, ease: EASE.power3Out, at: 0.1 },
   cue: {

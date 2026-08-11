@@ -407,9 +407,13 @@
    Utilities
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* Every content photograph prints in pure black and white. */
+/* Every content photograph prints in pure black and white.
+
+   The amount is a variable so motion can drive it: the hero reel tweens
+   `--photo-grayscale` to 0 across each frame's push-in. Everything else leaves
+   it at the fallback and stays a black-and-white print. */
 @utility grayscale-photo {
-  filter: grayscale(1) contrast(1.08);
+  filter: grayscale(var(--photo-grayscale, 1)) contrast(1.08);
 }
 
 /* The clipping window a masked heading line slides up through.
