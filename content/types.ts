@@ -189,6 +189,13 @@ export type Dictionary = {
     readonly paragraphs: readonly string[];
     /** Label on the rule that opens the roster; the count beside it is derived. */
     readonly teamLabel: string;
+    /** The link out of a portrait, for the members who have one. */
+    readonly profile: {
+      /** Printed in the caption. The destination is the same for everyone. */
+      readonly label: string;
+      /** Prefixed with the member's name to name the link for a screen reader. */
+      readonly aria: string;
+    };
     readonly team: readonly TeamMember[];
   };
   readonly insights: SectionIntro & {

@@ -52,6 +52,27 @@ export const TEAM_MEDIA = {
   "rafael-ruddy": { src: "/rafael-ruddy.webp", width: 457, height: 457 },
 } as const satisfies Record<string, MediaAsset>;
 
+/**
+ * Where a portrait links out to.
+ *
+ * One destination for the whole set, LinkedIn, so a visitor knows what a card
+ * opens before clicking it. A card that mixes destinations makes the reader
+ * guess, and guessing is the one thing a team roster cannot afford: these
+ * links exist to back the claim that the people are real.
+ *
+ * `Partial` on purpose. A collaborator with no profile worth showing keeps a
+ * card with no link rather than one pointing at an empty page, and the roster
+ * reads as complete either way, since the link line only prints where there is
+ * something behind it.
+ */
+export const TEAM_PROFILES: Partial<Record<TeamMemberId, string>> = {
+  "ricardo-paje": "https://www.linkedin.com/in/ricardo-monteiro-442362237/",
+  "fabio-junior": "https://www.linkedin.com/in/fabiojr0/",
+  "gabriel-hermenegildo": "https://www.linkedin.com/in/gabriel-hermenegildo/",
+  "guido-sanchis": "https://www.linkedin.com/in/guidosanchis/",
+  "rafael-ruddy": "https://www.linkedin.com/in/rafaelruddy/",
+};
+
 export type CaseId = keyof typeof CASE_MEDIA;
 export type QuoteId = keyof typeof QUOTE_MEDIA;
 export type TeamMemberId = keyof typeof TEAM_MEDIA;

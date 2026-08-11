@@ -318,6 +318,7 @@ export const ptBR = {
       "Atendemos startups buscando um MVP, empresas médias modernizando o que já roda, grandes empresas que precisam de mãos com critério, parceiros white-label e equipes do setor público.",
     ],
     teamLabel: "Quem faz",
+    profile: { label: "LinkedIn", aria: "no LinkedIn" },
     team: [
       {
         id: "ricardo-paje",

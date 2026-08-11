@@ -319,6 +319,7 @@ export const enUS = {
       "We serve startups looking for an MVP, mid-sized companies modernising what already runs, enterprises needing extra hands with judgement, white-label partners and public-sector teams.",
     ],
     teamLabel: "The people",
+    profile: { label: "LinkedIn", aria: "on LinkedIn" },
     team: [
       {
         id: "ricardo-paje",
