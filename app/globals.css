@@ -19,32 +19,31 @@
   --color-current: currentColor;
 
   /* ── Roles ─────────────────────────────────────────────────────────────
-     The accent is the one role that deliberately departs from the Modernist
-     sheet in design/_ds/: the vermilion is re-hued to a signal blue, which
-     reads as engineering rather than alarm and sits calmer on the warm ground
-     while the ink, surface and divider roles stay untouched.
+     The accent is the brand vermilion, at the hex the brand specifies. It is a
+     field colour first, and it is measured as one: 3.76:1 against the page
+     ground and 3.47:1 against the surface, which clears the 3:1 WCAG asks of a
+     UI component or of large text, and does not clear the 4.5:1 it asks of
+     body copy. Ink at body size therefore reads in `accent-700` rather than in
+     the base, which is why the link rule in the base layer and every eyebrow,
+     kicker and metric in the sections point at the ramp step.
 
-     It is also set considerably darker than the vermilion it replaces — OKLCH
-     L 0.49 rather than 0.61 — because the ground is light and the accent has
-     to work as ink as often as it works as a field. That buys 6.0:1 against
-     the page and 5.5:1 against the surface, clearing AA for body-sized text,
-     where the original 3.76:1 cleared nothing. */
+     In OKLCH the base is L 0.611 C 0.225 h 31.5, so it lands between ramp
+     steps 500 and 600 and the interaction chain steps down from there. */
   --color-bg: #f3f2f2;
   --color-surface: #eae9e9;
   --color-text: #201e1d;
-  --color-accent: #1d4ed8;
-  --color-accent-2: #345fc9;
+  --color-accent: #ec3013;
+  --color-accent-2: #a94231;
   --color-divider: color-mix(in srgb, #201e1d 40%, transparent);
 
   /* The hover tone for accent ink.
-     `accent-600`, which this replaces, is 3.99:1 on the page ground and 3.68:1
-     on the surface — a link that met AA at rest and stopped meeting it under
-     the pointer, which is the state a reader is in while deciding whether to
-     follow it. This sits between the base and 600 on the same hue: 5.13:1 and
-     4.73:1, still visibly brighter than the ink it lifts from. The ramp step
-     itself is left alone; it is a field colour elsewhere, where 3:1 is the
-     bar. */
-  --color-accent-hover: #265ae4;
+     A link rests at `accent-700` (6.41:1 on the page ground, 5.91:1 on the
+     surface) and brightens from there, the direction the vermilion moves in.
+     This is the brightest tone on the hue that still clears AA in the hovered
+     state as well as the resting one: 5.18:1 and 4.77:1. Anything nearer the
+     base hands the reader a link that met AA until they pointed at it, which
+     is the state they are in while deciding whether to follow it. */
+  --color-accent-hover: #c81d00;
 
   /* The edge of a form control.
      `--color-divider` draws the rules between sections, where it is decoration
@@ -57,18 +56,20 @@
 
   /* ── Tonal ramps ─────────────────────────────────────────────────────────
      Generated in OKLCH on one shared lightness scale, so the same step of any
-     role matches the others in visual value. The accent ramps hold the source
-     sheet's lightness per step and move only in hue and in a single chroma
-     factor — the whole ramp is pulled to the brand blue's own saturation — so
-     every step keeps roughly the contrast it was designed with (accent-700
-     against the ground is 6.1:1 here against the vermilion's 6.4:1).
+     role matches the others in visual value. The accent ramp holds that
+     lightness per step and carries the brand vermilion's own hue and chroma,
+     clamped into sRGB where the gamut runs out, so every step keeps the
+     contrast the scale was designed with: accent-700 is 6.4:1 on the ground.
 
-     The base role now lands *on* step 700 rather than between 500 and 600
-     where the vermilion sat, which inverts the interaction chain: the accent
-     is already the deep tone, so a control on an accent field darkens to
-     800/900 (see the primary button and the scrollbar thumb) and accent ink on
-     the light ground brightens to 600 on hover, instead of both stepping one
-     rung the other way. */
+     The base role sits between steps 500 and 600 rather than on a step, which
+     sets the direction of every interaction: a control on an accent field
+     darkens one rung to 700 and two to 800 (see the primary button and the
+     scrollbar thumb), and accent ink on the light ground rests at 700 and
+     brightens toward the base.
+
+     `accent-2` is the same hue held back in chroma. The palette is mono by
+     design, so it reads as a quieter sibling of the accent rather than as a
+     second colour, and its 100 to 500 steps are the accent's own. */
   --color-neutral-100: #f8f4f4;
   --color-neutral-200: #eae7e7;
   --color-neutral-300: #d7d3d3;
@@ -79,25 +80,25 @@
   --color-neutral-800: #444141;
   --color-neutral-900: #2d2b2b;
 
-  --color-accent-100: #f1f6ff;
-  --color-accent-200: #dde8ff;
-  --color-accent-300: #bfd5ff;
-  --color-accent-400: #94b6ff;
-  --color-accent-500: #6393ff;
-  --color-accent-600: #366df9;
-  --color-accent-700: #2552c5;
-  --color-accent-800: #1a3a8c;
-  --color-accent-900: #162955;
+  --color-accent-100: #fff3f0;
+  --color-accent-200: #fee0da;
+  --color-accent-300: #fdc5ba;
+  --color-accent-400: #f89b89;
+  --color-accent-500: #f06750;
+  --color-accent-600: #e12200;
+  --color-accent-700: #ae1800;
+  --color-accent-800: #7e0e00;
+  --color-accent-900: #4e160d;
 
-  --color-accent-2-100: #f1f6ff;
-  --color-accent-2-200: #dde8ff;
-  --color-accent-2-300: #bfd5ff;
-  --color-accent-2-400: #94b6ff;
-  --color-accent-2-500: #6393ff;
-  --color-accent-2-600: #4874db;
-  --color-accent-2-700: #3458ae;
-  --color-accent-2-800: #243e7c;
-  --color-accent-2-900: #1a2a4d;
+  --color-accent-2-100: #fff3f0;
+  --color-accent-2-200: #fee0da;
+  --color-accent-2-300: #fdc5ba;
+  --color-accent-2-400: #f89b89;
+  --color-accent-2-500: #f06750;
+  --color-accent-2-600: #bc5847;
+  --color-accent-2-700: #944132;
+  --color-accent-2-800: #692d23;
+  --color-accent-2-900: #43201a;
 
   /* Ink tints — the design file writes body copy and hairlines as
      `color-mix(in srgb, var(--color-text) N%, transparent)`. Tailwind's
@@ -378,11 +379,11 @@
     letter-spacing: -0.015em;
   }
 
-  /* The base accent is itself the deep tone now, so a link reads in it and
-     brightens on hover — the same direction the vermilion moved in, which went
-     from accent-700 up to the base. */
+  /* A link is body-size ink, and the base accent is 3.76:1, so it reads in the
+     ramp's 700 step and brightens on hover rather than the other way round.
+     Both ends of that move clear AA; see `--color-accent-hover`. */
   a {
-    color: var(--color-accent);
+    color: var(--color-accent-700);
     text-decoration: none;
   }
 
@@ -439,11 +440,11 @@
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-accent-800);
+    background: var(--color-accent-700);
   }
 
   ::-webkit-scrollbar-thumb:active {
-    background: var(--color-accent-900);
+    background: var(--color-accent-800);
   }
 }
 

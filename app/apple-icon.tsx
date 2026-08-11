@@ -18,7 +18,7 @@ export const contentType = "image/png";
 const COLOR = {
   bg: "#f3f2f2",
   text: "#201e1d",
-  accent: "#1d4ed8",
+  accent: "#ec3013",
 } as const;
 
 export default function AppleIcon() {

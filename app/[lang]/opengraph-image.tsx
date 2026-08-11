@@ -45,8 +45,8 @@ const COLOR = {
   bg: "#f3f2f2",
   surface: "#eae9e9",
   text: "#201e1d",
-  accent: "#1d4ed8",
-  accent700: "#2552c5",
+  accent: "#ec3013",
+  accent700: "#ae1800",
   divider: "rgba(32,30,29,0.4)",
 } as const;
 
