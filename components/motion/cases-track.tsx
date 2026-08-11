@@ -58,7 +58,8 @@ export function CasesTrack({
       });
     });
 
-    // Slow push-in on the card being pointed at.
+    // Slow push-in on the card being pointed at, with the print draining to
+    // colour underneath it.
     const cards = gsap.utils.toArray<HTMLElement>("[data-case]", root);
     const teardown: (() => void)[] = [];
 
@@ -66,11 +67,20 @@ export function CasesTrack({
       const image = card.querySelector<HTMLElement>("[data-case-image]");
       if (!image) return;
 
-      const zoom = (scale: number) => () => {
+      // Explicit, because a custom property that was never set computes to an
+      // empty string and GSAP would have no start value to interpolate from.
+      gsap.set(image, { [CASES.hover.color.property]: CASES.hover.color.from });
+
+      const hover = (scale: number, grayscale: number) => () => {
         gsap.to(image, { scale, duration: CASES.hover.duration, ease: CASES.hover.ease });
+        gsap.to(image, {
+          [CASES.hover.color.property]: grayscale,
+          duration: CASES.hover.color.duration,
+          ease: CASES.hover.color.ease,
+        });
       };
-      const enter = zoom(CASES.hover.scale);
-      const leave = zoom(1);
+      const enter = hover(CASES.hover.scale, CASES.hover.color.to);
+      const leave = hover(1, CASES.hover.color.from);
 
       card.addEventListener("mouseenter", enter);
       card.addEventListener("mouseleave", leave);

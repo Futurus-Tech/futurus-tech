@@ -195,7 +195,19 @@ export const CASES = {
   trailingGap: 48,
   /** Below this width the gallery stacks and the pin is skipped entirely. */
   minWidth: 760,
-  hover: { scale: 1.07, duration: 1.1, ease: EASE.power3Out },
+  hover: {
+    scale: 1.07,
+    duration: 1.1,
+    ease: EASE.power3Out,
+    /**
+     * Colour draining in under the pointer, on the same property the hero reel
+     * drives. Shorter than the push-in on purpose: the card should read as
+     * colour almost as soon as it is pointed at, while the scale keeps creeping
+     * for the rest of the second, and the print comes back on the same curve
+     * when the pointer leaves.
+     */
+    color: { property: "--photo-grayscale", from: 1, to: 0, duration: 0.5, ease: EASE.power2Out },
+  },
 } as const;
 
 /** Column drift in the team grid — second column only, above 1040px. */

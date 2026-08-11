@@ -410,8 +410,9 @@
 /* Every content photograph prints in pure black and white.
 
    The amount is a variable so motion can drive it: the hero reel tweens
-   `--photo-grayscale` to 0 across each frame's push-in. Everything else leaves
-   it at the fallback and stays a black-and-white print. */
+   `--photo-grayscale` to 0 across each frame's push-in, and a case card drains
+   it while the pointer rests on it. Everything else leaves it at the fallback
+   and stays a black-and-white print. */
 @utility grayscale-photo {
   filter: grayscale(var(--photo-grayscale, 1)) contrast(1.08);
 }
