@@ -25,7 +25,13 @@ import type { Dictionary } from "@/content/types";
  * without a profile is the same box with no anchor around it, so the roster
  * never shows a link that leads nowhere.
  */
-export function AboutSection({ content }: { content: Dictionary["about"] }) {
+export function AboutSection({
+  content,
+  newTabLabel,
+}: {
+  content: Dictionary["about"];
+  newTabLabel: string;
+}) {
   return (
     <section id="sobre" className="border-t-2 border-divider">
       <Container className="py-section">
@@ -58,10 +64,10 @@ export function AboutSection({ content }: { content: Dictionary["about"] }) {
 
         <div className="mt-gap-lg border-t-2 border-divider pt-5">
           <Reveal className="mb-7 flex items-baseline justify-between gap-6">
-            <span className="text-nav font-semibold uppercase text-text/60">
+            <span className="text-nav font-semibold uppercase text-text/65">
               {content.teamLabel}
             </span>
-            <span className="tnum text-nav font-semibold text-text/45">
+            <span className="tnum text-nav font-semibold text-text/65">
               {String(content.team.length).padStart(2, "0")}
             </span>
           </Reveal>
@@ -80,7 +86,7 @@ export function AboutSection({ content }: { content: Dictionary["about"] }) {
                     href: profile,
                     target: "_blank",
                     rel: "noopener noreferrer",
-                    "aria-label": `${member.name} ${content.profile.aria}`,
+                    "aria-label": `${member.name} ${content.profile.aria} (${newTabLabel})`,
                   }
                 : {};
 
@@ -108,11 +114,11 @@ export function AboutSection({ content }: { content: Dictionary["about"] }) {
                       <p className="m-0 font-heading text-brand-sm font-extrabold transition-colors duration-300 group-hover:text-accent group-focus-visible:text-accent">
                         {member.name}
                       </p>
-                      <p className="mt-1.5 text-label font-semibold uppercase text-text/62">
+                      <p className="mt-1.5 text-label font-semibold uppercase text-text/65">
                         {member.role}
                       </p>
                       {profile ? (
-                        <p className="mt-2.5 flex items-center gap-1.5 text-kicker font-semibold uppercase text-text/45 transition-colors duration-300 group-hover:text-accent group-focus-visible:text-accent">
+                        <p className="mt-2.5 flex items-center gap-1.5 text-kicker font-semibold uppercase text-text/65 transition-colors duration-300 group-hover:text-accent group-focus-visible:text-accent">
                           {content.profile.label}
                           <span aria-hidden>↗</span>
                         </p>

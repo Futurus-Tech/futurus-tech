@@ -26,6 +26,18 @@ export const ptBR = {
       "cloud e devops",
       "dados e BI",
     ],
+    organization:
+      "A Futurus Tech é uma consultoria brasileira de software e engenharia de produto. Projeta, constrói e mantém sistemas web, aplicativos, arquitetura em nuvem e plataformas de dados, entregando o código, as decisões e a documentação ao cliente.",
+  },
+
+  a11y: {
+    skipToContent: "Pular para o conteúdo",
+    primaryNav: "Navegação principal",
+    mobileNav: "Navegação do menu",
+    footerNav: "Links do rodapé",
+    contactForm: "Formulário de contato",
+    menuDialog: "Menu de navegação",
+    opensInNewTab: "abre em uma nova aba",
   },
 
   nav: {
@@ -364,6 +376,7 @@ export const ptBR = {
         excerpt:
           "Três projetos em que quebrar tudo em serviços custaria seis meses e não resolveria nada.",
         date: "12 mar 2026",
+        dateTime: "2026-03-12",
       },
       {
         category: "Processo",
@@ -371,12 +384,14 @@ export const ptBR = {
         excerpt:
           "Como transformamos “uns dois meses” em um número que a diretoria consegue aprovar.",
         date: "04 fev 2026",
+        dateTime: "2026-02-04",
       },
       {
         category: "IA",
         title: "Automação que sobrevive ao segundo mês",
         excerpt: "O que separa um piloto bonito de um processo que ninguém desliga depois.",
         date: "21 jan 2026",
+        dateTime: "2026-01-21",
       },
     ],
   },

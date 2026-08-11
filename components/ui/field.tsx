@@ -18,8 +18,11 @@ const control = cn(
   // `font: inherit` in the system sheet — form controls do not inherit the
   // page family on their own.
   "bg-surface text-text caret-accent font-body text-[14px]",
-  "border border-divider rounded-md",
-  "hover:border-text/45",
+  // `control-border`, not `divider`: this hairline is the only thing telling a
+  // reader where the field begins, so it is held to 3:1 rather than to the
+  // section rules' decorative weight.
+  "border border-control-border rounded-md",
+  "hover:border-text/70",
   "focus-visible:border-accent focus-visible:outline-offset-0",
   "transition-colors duration-150",
 );

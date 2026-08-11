@@ -87,24 +87,35 @@ flash of the un-animated state, and `MotionFallback` renders a `<noscript>` rule
 back when scripting is off and GSAP will never run. No inline script, nothing injected into the
 document.
 
+The hero is the exception, and deliberately so. `Reveal onLoad` and `SplitHeading onLoad` are
+animated by a stylesheet keyframe rather than by GSAP, because they are on screen at the first paint
+and hiding them until hydration made the browser's Largest Contentful Paint the moment the bundle
+finished — measured at 3.5s, nearly all of it spent waiting rather than drawing. The components skip
+their tween and hand the tokens to CSS as custom properties instead, so the distances, durations,
+stagger and curve are still the ones in `tokens.ts` and nothing animates twice. `CSS_EASE` records
+the one translation this needs, `expo.out` to its cubic-bézier fit.
+
 ### Locales, geolocation and link previews
 
 `/pt-br` and `/en-us` are the real pages, both statically generated with their own metadata, `hreflang`
 alternates and OG image. `/` only decides where to send a request, in `proxy.ts`:
 
 1. an explicit choice remembered in the `NEXT_LOCALE` cookie;
-2. a social crawler — served the default locale by **rewrite**, never geolocated, because a bot's
-   datacentre says nothing about its audience;
-3. geolocation (`x-vercel-ip-country`, `cf-ipcountry`, and others) — Brazil and the rest of the
-   Lusophone world get Portuguese;
-4. `Accept-Language`;
-5. the default, `pt-br`.
+2. geolocation (`x-vercel-ip-country`, `cf-ipcountry`, and others): Brazil and the rest of the
+   Lusophone world get Portuguese, everyone else gets English;
+3. `Accept-Language`, for edges that strip the geo headers and for local dev;
+4. the default, `pt-br`.
 
-People get a **redirect**, so the URL in their address bar is already language-specific. That is
-what makes shared links correct: when someone in Brazil pastes their URL into WhatsApp, LinkedIn or
-Discord, the crawler fetches `/pt-br` and builds a Portuguese card — even though the crawler itself is
-in another country. A bare `/` still renders (rewritten to the default locale) so it always has a
-card, with `og:locale:alternate` and `hreflang` declaring the other language.
+Geolocation applies to preview crawlers too, so the language and the OG image of a card for `/`
+follow the country of whichever IP fetched it. For a preview that IP belongs to the platform's
+datacentre rather than to the person who pasted the link, so a bare `/` shared on WhatsApp or
+LinkedIn will usually preview in English.
+
+People get a **redirect** and land on `/pt-br` or `/en-us`, so the URL in their address bar is
+already language-specific. Crawlers get a **rewrite**, which keeps the shared `/` as the URL that
+carries the card. A link whose preview has to be in a particular language is the localised one:
+`/en-us` serves and previews in English from anywhere, Brazil included, and `/pt-br` likewise, since
+naming the language in the URL outranks both the cookie and the country.
 
 The decision is echoed on the response as `x-locale` / `x-locale-reason` for debugging.
 

@@ -100,7 +100,14 @@ export type Post = {
   readonly category: string;
   readonly title: string;
   readonly excerpt: string;
+  /** Printed as written — the locale's own short form. */
   readonly date: string;
+  /**
+   * The same day as an ISO 8601 date, for the `<time datetime>` attribute and
+   * for `datePublished` in the article's structured data. Machines read this
+   * one; `date` is what a person sees.
+   */
+  readonly dateTime: string;
 };
 
 export type FaqItem = {
@@ -150,6 +157,33 @@ export type Dictionary = {
     readonly ogTagline: string;
     readonly ogImageAlt: string;
     readonly keywords: readonly string[];
+    /**
+     * One sentence describing the firm, for the `description` of the
+     * Organization node in the structured data. Shorter and flatter than the
+     * meta description, because a knowledge panel quotes it verbatim.
+     */
+    readonly organization: string;
+  };
+  /**
+   * Copy that only assistive technology reads.
+   *
+   * It is localised for the same reason the visible copy is: a screen reader
+   * announces these strings in the voice of the page's language, and a
+   * Portuguese document that says "Skip to content" is a document that has
+   * stopped speaking Portuguese halfway through.
+   */
+  readonly a11y: {
+    /** The first thing in the tab order, hidden until it takes focus. */
+    readonly skipToContent: string;
+    /** Names the landmarks, so a reader's landmark list is not three "navigation"s. */
+    readonly primaryNav: string;
+    readonly mobileNav: string;
+    readonly footerNav: string;
+    readonly contactForm: string;
+    /** Announced when the full-screen menu takes over the page. */
+    readonly menuDialog: string;
+    /** Suffixes the external links that leave the site. */
+    readonly opensInNewTab: string;
   };
   readonly nav: {
     readonly items: readonly NavItem[];

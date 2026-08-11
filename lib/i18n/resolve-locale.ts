@@ -9,9 +9,11 @@ import {
 /**
  * User agents that fetch a page to build a preview card rather than to read it.
  *
- * These matter because they are almost always hosted outside Brazil: geolocating
- * the request would hand a Brazilian visitor's shared link an English preview.
- * A crawler therefore skips geolocation entirely and gets the default locale.
+ * These do not pick the language: `/` is geolocated for everyone, crawler or
+ * not, so a preview card reflects the IP that asked for it. What the list
+ * decides is *how* the root is served. A crawler has no address bar and must
+ * keep the shared URL, so it is rewritten; a reader is redirected onto the
+ * localised URL instead.
  */
 const SOCIAL_CRAWLERS =
   /facebookexternalhit|facebookcatalog|meta-externalagent|WhatsApp|Twitterbot|LinkedInBot|Discordbot|Slackbot|Slack-ImgProxy|TelegramBot|SkypeUriPreview|Pinterest|redditbot|vkShare|Iframely|embedly|Applebot|Googlebot|bingbot|DuckDuckBot|YandexBot|Bluesky|Mastodon|quora link preview|W3C_Validator|nuzzel|outbrain|SnapchatAds|Viber|Line;|Google-InspectionTool/i;
@@ -43,33 +45,33 @@ export function countryFromHeaders(headers: Headers): string | undefined {
 
 export type LocaleDecision = {
   locale: Locale;
-  /** How the choice was made — surfaced as a response header for debugging. */
-  reason: "cookie" | "crawler" | "geo" | "accept-language" | "default";
+  /** How the choice was made, surfaced as a response header for debugging. */
+  reason: "cookie" | "geo" | "accept-language" | "default";
 };
 
 /**
  * Decide which language an unlocalised request should be served in.
  *
+ * This answers for `/` only. `/pt-br` and `/en-us` are explicit: whoever asks
+ * for one gets it, from any country and whatever their cookie says, because
+ * naming the language in the URL is the strongest signal there is.
+ *
  * The order is deliberate:
- *  1. an explicit choice, remembered in a cookie — never overrule the reader;
- *  2. a preview crawler, which gets the default locale so a shared link's card
- *     is deterministic instead of depending on which datacentre answered;
- *  3. geolocation — Brazil and the rest of the Lusophone world read Portuguese;
- *  4. `Accept-Language`, for edges that strip geo headers and for local dev;
- *  5. the default.
+ *  1. an explicit choice, remembered in a cookie: never overrule the reader;
+ *  2. geolocation: Brazil and the rest of the Lusophone world read Portuguese,
+ *     everyone else reads English. This applies to preview crawlers too, so a
+ *     card for `/` matches the country the request came from;
+ *  3. `Accept-Language`, for edges that strip geo headers and for local dev;
+ *  4. the default.
  */
 export function resolveLocale({
   cookie,
-  userAgent,
   headers,
 }: {
   cookie: string | undefined;
-  userAgent: string | null;
   headers: Headers;
 }): LocaleDecision {
   if (isLocale(cookie)) return { locale: cookie, reason: "cookie" };
-
-  if (isSocialCrawler(userAgent)) return { locale: DEFAULT_LOCALE, reason: "crawler" };
 
   const byCountry = localeFromCountry(countryFromHeaders(headers));
   if (byCountry) return { locale: byCountry, reason: "geo" };

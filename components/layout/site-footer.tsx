@@ -11,10 +11,24 @@ export function SiteFooter({ dict }: { dict: Dictionary }) {
 
       <p className="text-fine text-text/65">{dict.footer.copyright}</p>
 
-      <div className="flex gap-[18px] text-fine">
-        <a href={siteConfig.linkedin}>{dict.footer.linkedin}</a>
+      {/* Named, because a reader listing the page's landmarks would otherwise
+          find a second unlabelled navigation and have to open it to find out
+          which one it is. */}
+      <nav aria-label={dict.a11y.footerNav} className="flex gap-[18px] text-fine">
+        {/* The one link that leaves the site. It opens in a new tab so a reader
+            who followed it has not lost the page, and the label says so — a
+            tab appearing with no warning is disorienting when the pointer is
+            not what noticed it. */}
+        <a
+          href={siteConfig.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${dict.footer.linkedin} (${dict.a11y.opensInNewTab})`}
+        >
+          {dict.footer.linkedin}
+        </a>
         <a href="#top">{dict.footer.backToTop}</a>
-      </div>
+      </nav>
     </footer>
   );
 }

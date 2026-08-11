@@ -26,6 +26,18 @@ export const enUS = {
       "cloud and devops",
       "data and BI",
     ],
+    organization:
+      "Futurus Tech is a Brazilian software consulting and product engineering firm. It designs, builds and maintains web systems, mobile apps, cloud architecture and data platforms, handing the code, the decisions and the documentation to the client.",
+  },
+
+  a11y: {
+    skipToContent: "Skip to content",
+    primaryNav: "Primary navigation",
+    mobileNav: "Menu navigation",
+    footerNav: "Footer links",
+    contactForm: "Contact form",
+    menuDialog: "Navigation menu",
+    opensInNewTab: "opens in a new tab",
   },
 
   nav: {
@@ -365,18 +377,21 @@ export const enUS = {
         excerpt:
           "Three projects where splitting everything into services would cost six months and fix nothing.",
         date: "12 mar 2026",
+        dateTime: "2026-03-12",
       },
       {
         category: "Process",
         title: "Estimating without lying to yourself",
         excerpt: "How we turn “about two months” into a number a board can approve.",
         date: "04 feb 2026",
+        dateTime: "2026-02-04",
       },
       {
         category: "AI",
         title: "Automation that survives the second month",
         excerpt: "What separates a pretty pilot from a process nobody switches off.",
         date: "21 jan 2026",
+        dateTime: "2026-01-21",
       },
     ],
   },

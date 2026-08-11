@@ -1,9 +1,9 @@
 "use client";
 
-import type { ElementType } from "react";
+import type { CSSProperties, ElementType } from "react";
 
 import { gsap } from "@/lib/motion/gsap";
-import { SPLIT } from "@/lib/motion/tokens";
+import { CSS_EASE, SPLIT } from "@/lib/motion/tokens";
 import { useGsapEffect } from "@/lib/motion/use-gsap-effect";
 import { cn } from "@/lib/utils/cn";
 
@@ -17,6 +17,11 @@ import { cn } from "@/lib/utils/cn";
  *
  * `data-split` hides the heading before paint (see globals.css); the effect
  * makes it visible in the same frame it sets the lines' starting offset.
+ *
+ * `onLoad` hands the whole thing to the stylesheet instead. The hero heading is
+ * the first thing on the page, so making it wait for GSAP is making the page's
+ * headline wait for a bundle — the CSS animation runs from the first painted
+ * frame and needs no script at all.
  */
 export function SplitHeading({
   as: Component = "h2",
@@ -37,6 +42,9 @@ export function SplitHeading({
 }) {
   const ref = useGsapEffect<HTMLHeadingElement>(
     (root) => {
+      // Owned by the stylesheet — see the class comment and globals.css.
+      if (onLoad) return;
+
       const inner = root.querySelectorAll<HTMLElement>("[data-split-line]");
       if (inner.length === 0) return;
 
@@ -56,20 +64,37 @@ export function SplitHeading({
           duration: SPLIT.duration,
           ease: SPLIT.ease,
           stagger: SPLIT.stagger,
-          scrollTrigger: onLoad ? null : { trigger: root, start: SPLIT.start },
-          delay: onLoad ? SPLIT.heroDelay : 0,
+          scrollTrigger: { trigger: root, start: SPLIT.start },
         },
       );
     },
     [onLoad],
   );
 
+  /* Same numbers the tween above uses, handed to the stylesheet. `fromYPercent`
+     becomes a percentage because that is what `yPercent` already meant. */
+  const loadStyle = {
+    "--split-from-y": `${SPLIT.fromYPercent}%`,
+    "--split-duration": `${SPLIT.duration}s`,
+    "--split-delay": `${SPLIT.heroDelay}s`,
+    "--split-stagger": `${SPLIT.stagger}s`,
+    "--split-ease": CSS_EASE[SPLIT.ease],
+  } as CSSProperties;
+
   return (
-    <Component ref={ref} data-split className={className}>
+    <Component
+      ref={ref}
+      data-split={onLoad ? "load" : true}
+      className={className}
+      style={onLoad ? loadStyle : undefined}
+    >
       {lines.map((line, index) => (
         <span key={line} className={cn("mask-line", lineClassName)}>
           <span
             data-split-line
+            // The line's place in the stagger. Read by the CSS animation's
+            // delay; ignored entirely when GSAP is the one animating.
+            style={onLoad ? ({ "--split-index": index } as CSSProperties) : undefined}
             className={cn("block will-change-transform", index === accentLine && "text-accent")}
           >
             {line}

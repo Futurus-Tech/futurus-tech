@@ -15,7 +15,7 @@ import type { NavItem } from "@/content/types";
  * section. Colours are read from the design tokens once, so GSAP interpolates
  * real values instead of `var()` strings.
  */
-export function NavLinks({ items }: { items: readonly NavItem[] }) {
+export function NavLinks({ items, label }: { items: readonly NavItem[]; label: string }) {
   const ref = useGsapEffect<HTMLElement>(
     (root) => {
       const styles = getComputedStyle(document.documentElement);
@@ -50,7 +50,12 @@ export function NavLinks({ items }: { items: readonly NavItem[] }) {
         }
         if (hit) {
           gsap.to(hit, { color: accent, duration: MASTHEAD.navHighlightDuration });
-          hit.setAttribute("aria-current", "true");
+          // `location`, not `page`: every link here points into the document
+          // the reader is already on, so what is current is the part of it
+          // they have reached, not which page of a set they are looking at.
+          // It is also the only cue a screen reader gets — the colour change
+          // beside it says nothing to one.
+          hit.setAttribute("aria-current", "location");
         }
         current = hit;
       };
@@ -62,7 +67,7 @@ export function NavLinks({ items }: { items: readonly NavItem[] }) {
   );
 
   return (
-    <nav ref={ref} className="hidden items-center gap-[26px] nav:flex">
+    <nav ref={ref} aria-label={label} className="hidden items-center gap-[26px] nav:flex">
       {items.map((item) => (
         <a
           key={item.href}

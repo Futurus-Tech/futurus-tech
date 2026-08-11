@@ -14,8 +14,16 @@ import type { Dictionary } from "@/content/types";
  * the display step it deserves — "Respondemos em 24 horas." cannot breathe in
  * a five-column well — with the details and the form running beneath it.
  */
-export function ContactSection({ content }: { content: Dictionary["contact"] }) {
-  const term = "text-label font-semibold uppercase text-text/60";
+export function ContactSection({
+  content,
+  formLabel,
+  newTabLabel,
+}: {
+  content: Dictionary["contact"];
+  formLabel: string;
+  newTabLabel: string;
+}) {
+  const term = "text-label font-semibold uppercase text-text/65";
 
   return (
     <section id="contato" className="border-y-2 border-divider">
@@ -44,7 +52,17 @@ export function ContactSection({ content }: { content: Dictionary["contact"] }) 
 
               <dt className={term}>{content.details.linkedinLabel}</dt>
               <dd className="m-0">
-                <a href={siteConfig.linkedin}>{siteConfig.linkedinHandle}</a>
+                {/* Off-site, so it opens beside the page rather than replacing
+                    it, and the name says so — the same treatment the footer's
+                    copy of this link gets. */}
+                <a
+                  href={siteConfig.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${siteConfig.linkedinHandle} (${newTabLabel})`}
+                >
+                  {siteConfig.linkedinHandle}
+                </a>
               </dd>
 
               <dt className={term}>{content.details.hoursLabel}</dt>
@@ -52,7 +70,7 @@ export function ContactSection({ content }: { content: Dictionary["contact"] }) 
             </Reveal>
           </div>
 
-          <ContactForm content={content.form} />
+          <ContactForm content={content.form} label={formLabel} />
         </div>
       </div>
     </section>

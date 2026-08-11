@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { cookies, headers } from "next/headers";
 
 import { ErrorHeader } from "@/components/layout/error-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { SkipLink } from "@/components/layout/skip-link";
 import { MotionFallback } from "@/components/motion/motion-fallback";
 import { NotFoundSection } from "@/components/sections/not-found-section";
 import { archivo } from "@/lib/fonts";
@@ -44,10 +45,20 @@ async function negotiateLocale(): Promise<Locale> {
 
   return resolveLocale({
     cookie: cookieStore.get(LOCALE_COOKIE)?.value,
-    userAgent: headerList.get("user-agent"),
     headers: headerList,
   }).locale;
 }
+
+/**
+ * Its own document, so it needs its own copy of anything the layout declares —
+ * the same reason the stylesheet, the font and `MotionFallback` are imported
+ * here. Values match `app/[lang]/layout.tsx`; a 404 that repainted the browser
+ * chrome a different colour would read as a different site.
+ */
+export const viewport: Viewport = {
+  themeColor: "#f3f2f2",
+  colorScheme: "light",
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await negotiateLocale();
@@ -56,6 +67,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: dict.notFound.metaTitle,
     description: dict.notFound.lead,
+    /* Next.js already answers this with a 404 status, which is the signal that
+       counts. The tag says the same thing to a crawler that reached the body
+       without reading the status line, and stops the page competing with the
+       real one for the brand's own name. */
+    robots: { index: false, follow: true },
   };
 }
 
@@ -70,6 +86,7 @@ export default async function GlobalNotFound() {
           `SmoothScroll` is deliberately absent: there is nothing to scroll
           through, and a 404 should not pay for Lenis to find that out. */}
       <body className="flex min-h-[100svh] flex-col">
+        <SkipLink label={dict.a11y.skipToContent} target="#top" />
         <MotionFallback />
         <ErrorHeader dict={dict} locale={locale} />
         <NotFoundSection content={dict.notFound} nav={dict.nav} locale={locale} />

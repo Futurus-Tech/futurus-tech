@@ -14,7 +14,13 @@ import type { ContactFormContent } from "@/content/types";
  * Wiring it up means replacing the handler with a Server Action and keeping
  * the rest of this component as it stands.
  */
-export function ContactForm({ content }: { content: ContactFormContent }) {
+export function ContactForm({
+  content,
+  label,
+}: {
+  content: ContactFormContent;
+  label: string;
+}) {
   const [sent, setSent] = useState(false);
   const ids = useId();
   const fieldId = (name: string) => `${ids}-${name}`;
@@ -25,7 +31,9 @@ export function ContactForm({ content }: { content: ContactFormContent }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+    // Named, because the form is a landmark of its own the moment it has an
+    // accessible name, and an unnamed one is a `<form>` a reader cannot jump to.
+    <form onSubmit={onSubmit} aria-label={label} className="grid grid-cols-1 gap-5 sm:grid-cols-2">
       <Field label={content.name.label} htmlFor={fieldId("name")}>
         <Input
           id={fieldId("name")}
@@ -87,7 +95,12 @@ export function ContactForm({ content }: { content: ContactFormContent }) {
           {content.submit}
         </Button>
 
-        <p aria-live="polite" className="m-0 text-[13.5px] font-semibold text-accent-700">
+        {/* `role="status"` carries the polite live region with it and, unlike
+            `aria-live` alone, gives the announcement a role older screen
+            readers recognise. The element is in the markup from the first
+            render — a live region added at the same moment its text is has
+            nothing to announce, because there was no "before" to compare. */}
+        <p role="status" className="m-0 text-[13.5px] font-semibold text-accent-700">
           {sent ? content.success : null}
         </p>
       </div>

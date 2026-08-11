@@ -42,7 +42,10 @@ export function NotFoundSection({
   const suggestions = [...nav.items, nav.contact];
 
   return (
-    <main id="top" className="flex-1 font-body text-[16px]/[1.6]">
+    // `tabIndex={-1}` so the skip link's jump moves focus here and not only the
+    // scroll position. The id stays `top`, which the footer's back-to-top link
+    // already points at, rather than growing a second one for the same element.
+    <main id="top" tabIndex={-1} className="flex-1 font-body text-[16px]/[1.6]">
       <div className="mx-auto max-w-page px-edge pb-section pt-hero-top">
         <Reveal onLoad className="mb-7 flex items-baseline gap-3.5">
           <AccentSquare />

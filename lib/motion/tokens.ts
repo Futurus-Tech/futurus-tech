@@ -17,6 +17,23 @@ export const EASE = {
   power3Out: "power3.out",
 } as const;
 
+/**
+ * The same curves, written for CSS.
+ *
+ * Everything above the fold animates in a stylesheet rather than in GSAP (see
+ * the "first paint" block in globals.css), and a stylesheet cannot call
+ * `expo.out`. `cubic-bezier(0.16, 1, 0.3, 1)` is the standard four-point fit to
+ * GSAP's exponential ease — it leaves the origin at the same speed and settles
+ * on the same long tail — so the hero and the sections below it are still one
+ * motion vocabulary and not two.
+ *
+ * This lives beside `EASE` rather than in globals.css because a curve is a
+ * motion number, and motion numbers are declared in exactly one file.
+ */
+export const CSS_EASE = {
+  [EASE.expoOut]: "cubic-bezier(0.16, 1, 0.3, 1)",
+} as const;
+
 /** Lenis — smooth scroll feel and the programmatic jump used by anchors. */
 export const SMOOTH_SCROLL = {
   lerp: 0.075,

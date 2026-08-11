@@ -14,12 +14,31 @@ import { siteConfig } from "@/lib/site";
  * generic card. `/pt-br` and `/en-us` each get their own image, which is what makes
  * a shared link's preview match the language the sharer was reading.
  */
-export const alt = siteConfig.name;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
+}
+
+/**
+ * The card's alt text, in the language of the card.
+ *
+ * A bare `export const alt` is one string for the whole route, and this route
+ * serves two languages — the Portuguese card would have carried an English
+ * description of itself, or the other way round. `generateImageMetadata` is
+ * the one hook that sees `params`, so the alt is read from the same dictionary
+ * that wrote the words in the image. One image per locale, so one entry.
+ *
+ * `params` is awaited because Next 16 hands it over as a promise; awaiting a
+ * plain object returns the object, so this reads correctly either way.
+ */
+export async function generateImageMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  const locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
+  const dict = await getDictionary(locale);
+
+  return [{ id: locale, alt: dict.metadata.ogImageAlt, size, contentType }];
 }
 
 const COLOR = {

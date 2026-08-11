@@ -22,7 +22,7 @@ export function SiteHeader({ dict, locale }: { dict: Dictionary; locale: Locale 
           <Wordmark />
         </a>
 
-        <NavLinks items={dict.nav.items} />
+        <NavLinks items={dict.nav.items} label={dict.a11y.primaryNav} />
 
         <LanguageToggle locale={locale} label={dict.nav.languageLabel} />
 
@@ -35,6 +35,7 @@ export function SiteHeader({ dict, locale }: { dict: Dictionary; locale: Locale 
           contact={dict.nav.contact}
           menuLabel={dict.nav.menuLabel}
           closeLabel={dict.nav.closeLabel}
+          dialogLabel={dict.a11y.menuDialog}
         />
       </div>
 

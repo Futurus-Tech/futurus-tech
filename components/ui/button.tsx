@@ -47,7 +47,9 @@ const variants: Record<ButtonTone, Record<ButtonVariant, string>> = {
     // The base accent already sits at the ramp's 700 step, so the pressed
     // states step to 800/900 to stay perceptible.
     primary: "bg-accent text-bg hover:bg-accent-800 active:bg-accent-900",
-    secondary: "border-divider text-text hover:bg-text/7 active:bg-text/14",
+    // The border is this variant's whole boundary — there is no fill behind it
+    // — so it takes the control weight rather than the section rules'.
+    secondary: "border-control-border text-text hover:bg-text/7 active:bg-text/14",
     ghost: "px-1 text-accent hover:bg-accent/10 active:bg-accent/18",
   },
   inverse: {

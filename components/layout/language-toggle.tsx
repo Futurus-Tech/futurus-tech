@@ -28,11 +28,17 @@ export function LanguageToggle({ locale, label }: { locale: Locale; label: strin
     <Link
       href={`/${target}`}
       hrefLang={LOCALE_TAG[target]}
-      aria-label={label}
+      /* The visible text leads the accessible name, and is not merely replaced
+         by it. Someone driving the page by voice says what they can see —
+         "click en" — and a name of "Ver em inglês" alone contains no "en" for
+         that command to match, which is what WCAG 2.5.3 is about. The
+         explanation still follows, for a reader who gets the name and not the
+         two characters. */
+      aria-label={`${LOCALE_SHORT[target]}: ${label}`}
       onClick={() => {
         document.cookie = `${LOCALE_COOKIE}=${target}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; samesite=lax`;
       }}
-      className="cursor-pointer border-2 border-divider bg-transparent px-2.5 py-2 font-heading text-[12px] font-extrabold uppercase tracking-[0.08em] text-text transition-colors duration-150 hover:border-accent hover:text-accent"
+      className="inline-flex min-h-[36px] cursor-pointer items-center border-2 border-control-border bg-transparent px-2.5 py-2 font-heading text-[12px] font-extrabold uppercase tracking-[0.08em] text-text transition-colors duration-150 hover:border-accent hover:text-accent"
     >
       {/* The button says `pt`/`en`: two characters is all it has room for, and
           the region is carried by the href and `hrefLang` either way. */}

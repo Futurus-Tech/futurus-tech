@@ -8,8 +8,9 @@ import { siteConfig, siteUrl } from "@/lib/site";
  * Metadata for a localised route.
  *
  * Each language is its own canonical URL with its own OG image, which is what
- * makes link previews correct: a crawler fetching `/pt-br` gets Portuguese, one
- * fetching `/en-us` gets English, regardless of where the crawler itself sits.
+ * makes a shared link's preview deterministic: a crawler fetching `/pt-br` gets
+ * Portuguese, one fetching `/en-us` gets English, from wherever it sits. Only a
+ * bare `/` is geolocated, and it renders one of these two under its own URL.
  * `hreflang` (including `x-default`) tells search engines the two documents
  * are the same page in two languages rather than duplicates.
  */
@@ -28,10 +29,33 @@ export async function buildMetadata(locale: Locale): Promise<Metadata> {
     description: metadata.description,
     keywords: [...metadata.keywords],
     applicationName: siteConfig.name,
+    authors: [{ name: siteConfig.name, url: siteConfig.url }],
+    creator: siteConfig.name,
+    publisher: siteConfig.name,
+    category: "technology",
+    /* Safari turns anything that looks like a phone number or a postal address
+       into a link of its own, restyled outside the design system. The page has
+       one address worth linking, the mailto, and it is already an anchor. */
+    formatDetection: { telephone: false, address: false, email: false },
     alternates: {
       canonical: `/${locale}`,
       languages,
     },
+    /* Declaring `icons` at all replaces what the file conventions would have
+       emitted, so `apple` is named here explicitly — without it Safari falls
+       back to a screenshot of the page for a home-screen shortcut. The SVG
+       leads because it is the only one that stays sharp at every size a
+       browser might ask for; the .ico follows for the ones that cannot read
+       it. */
+    icons: {
+      icon: [
+        { url: "/icon.svg", type: "image/svg+xml" },
+        { url: "/favicon.ico", sizes: "any" },
+      ],
+      shortcut: "/favicon.ico",
+      apple: { url: "/apple-icon", sizes: "180x180", type: "image/png" },
+    },
+    manifest: "/manifest.webmanifest",
     openGraph: {
       type: "website",
       siteName: siteConfig.name,
@@ -48,10 +72,20 @@ export async function buildMetadata(locale: Locale): Promise<Metadata> {
       title: metadata.ogTitle,
       description: metadata.ogDescription,
     },
+    /* The googleBot block is not a restatement of the generic one: the three
+       preview directives exist only for Google, and keeping them there leaves
+       the generic `robots` tag readable to every other crawler. `-1` means "no
+       limit" for both the snippet length and the video preview. */
     robots: {
       index: true,
       follow: true,
-      googleBot: { index: true, follow: true, "max-image-preview": "large" },
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
     },
   };
 }

@@ -9,7 +9,14 @@ export function HeroSection({ content }: { content: Dictionary["hero"] }) {
   return (
     <section id="top" className="mx-auto max-w-page pt-hero-top">
       <div className="px-edge">
-        <Reveal className="mb-7 flex items-baseline gap-3.5">
+        {/* Every part of the hero is `onLoad`, which now means two things: it
+            rides the heading's beat rather than a trigger line the reader is
+            already past, and the stylesheet animates it instead of GSAP. The
+            eyebrow and the paragraph below used to be scroll-triggered, and
+            their triggers did fire immediately — but only once the bundle had
+            arrived, which left the page's opening paragraph as the last thing
+            on it to paint. */}
+        <Reveal onLoad className="mb-7 flex items-baseline gap-3.5">
           <AccentSquare />
           <span className="text-eyebrow font-semibold uppercase text-accent-700">
             {content.eyebrow}
@@ -25,13 +32,10 @@ export function HeroSection({ content }: { content: Dictionary["hero"] }) {
         />
 
         <div className="mt-11 grid grid-cols-1 items-end gap-8 gap-x-gap-md lg:grid-cols-2">
-          <Reveal as="p" className="m-0 max-w-[46ch] text-lead text-text/80">
+          <Reveal as="p" onLoad className="m-0 max-w-[46ch] text-lead text-text/80">
             {content.lead}
           </Reveal>
 
-          {/* `onLoad` — the actions sit above the fold, so they ride the
-              heading's entrance instead of waiting on a trigger line the
-              visitor has already scrolled past. */}
           <Reveal onLoad className="flex flex-wrap gap-3.5">
             <ButtonLink href={content.primaryCta.href} variant="primary" size="lg">
               {content.primaryCta.label}

@@ -50,7 +50,7 @@ export function TestimonialsSection({ content }: { content: Dictionary["testimon
                 />
                 <span className="flex flex-col gap-[3px]">
                   <span className="font-heading text-[14.5px] font-extrabold">{item.author}</span>
-                  <span className="text-[12px] font-semibold uppercase tracking-[0.07em] text-text/60">
+                  <span className="text-[12px] font-semibold uppercase tracking-[0.07em] text-text/65">
                     {item.role}
                   </span>
                 </span>

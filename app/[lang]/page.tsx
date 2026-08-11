@@ -35,7 +35,10 @@ export default async function LandingPage({ params }: { params: Promise<{ lang: 
     <>
       <SiteHeader dict={dict} locale={lang} />
 
-      <main className="font-body text-[16px]/[1.6]">
+      {/* `tabIndex={-1}` so the skip link's jump actually moves focus here and
+          not just the scroll position — without it the next Tab would resume
+          from the masthead the reader just asked to skip. */}
+      <main id="main" tabIndex={-1} className="font-body text-[16px]/[1.6]">
         <HeroSection content={dict.hero} />
         <MarqueeSection items={dict.marquee} />
         <StatsSection items={dict.stats} />
@@ -45,10 +48,14 @@ export default async function LandingPage({ params }: { params: Promise<{ lang: 
         <ClientsSection content={dict.clients} />
         <TestimonialsSection content={dict.testimonials} />
         <PlansSection content={dict.plans} />
-        <AboutSection content={dict.about} />
+        <AboutSection content={dict.about} newTabLabel={dict.a11y.opensInNewTab} />
         <InsightsSection content={dict.insights} />
         <FaqSection content={dict.faq} />
-        <ContactSection content={dict.contact} />
+        <ContactSection
+          content={dict.contact}
+          formLabel={dict.a11y.contactForm}
+          newTabLabel={dict.a11y.opensInNewTab}
+        />
       </main>
 
       <SiteFooter dict={dict} />

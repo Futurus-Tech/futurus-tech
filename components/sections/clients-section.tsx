@@ -28,7 +28,7 @@ export function ClientsSection({ content }: { content: Dictionary["clients"] }) 
               <AccentSquare size={9} />
               <span className="font-heading text-logo font-extrabold">
                 {logo.name}
-                <span className="text-text/45">{logo.suffix}</span>
+                <span className="text-text/65">{logo.suffix}</span>
               </span>
             </div>
           ))}

@@ -36,6 +36,25 @@
   --color-accent-2: #345fc9;
   --color-divider: color-mix(in srgb, #201e1d 40%, transparent);
 
+  /* The hover tone for accent ink.
+     `accent-600`, which this replaces, is 3.99:1 on the page ground and 3.68:1
+     on the surface — a link that met AA at rest and stopped meeting it under
+     the pointer, which is the state a reader is in while deciding whether to
+     follow it. This sits between the base and 600 on the same hue: 5.13:1 and
+     4.73:1, still visibly brighter than the ink it lifts from. The ramp step
+     itself is left alone; it is a field colour elsewhere, where 3:1 is the
+     bar. */
+  --color-accent-hover: #265ae4;
+
+  /* The edge of a form control.
+     `--color-divider` draws the rules between sections, where it is decoration
+     and its 2.4:1 is the design's business. An input's border is not
+     decoration: it is the only thing saying where the control is, which WCAG
+     1.4.11 holds to 3:1 against its ground. This is the same ink at the tint
+     that clears it (3.6:1 on both grounds) and nowhere near dark enough to
+     read as a second rule weight. */
+  --color-control-border: color-mix(in srgb, #201e1d 55%, transparent);
+
   /* ── Tonal ramps ─────────────────────────────────────────────────────────
      Generated in OKLCH on one shared lightness scale, so the same step of any
      role matches the others in visual value. The accent ramps hold the source
@@ -84,7 +103,15 @@
      `color-mix(in srgb, var(--color-text) N%, transparent)`. Tailwind's
      opacity modifier resolves to the same rgba, so those are written as
      `text-text/78`, `bg-text/4`, `bg-text/15` at the call site rather than as
-     a parallel set of tokens. */
+     a parallel set of tokens.
+
+     For *type*, 65% is the floor. The ink is nearly black, so a tint of it on
+     either ground falls off fast: /78 is 7.6:1, /70 is 5.8:1, /65 is 4.95:1 on
+     the page and 4.78:1 on the surface — and /62 is already 4.37:1 on the
+     surface, under AA. The design's quieter labels were written at /45, /60
+     and /62 and now all sit at /65, which is the lowest step that still clears
+     4.5:1 against both grounds. Anything below it is for fields and hairlines,
+     never for words. */
 
   /* ── Type families ───────────────────────────────────────────────────────
      Wired to the `next/font` CSS variables declared in app/[lang]/layout.tsx,
@@ -316,6 +343,14 @@
   html {
     scrollbar-width: thin;
     scrollbar-color: var(--color-accent) var(--color-surface);
+
+    /* The masthead is fixed, so an anchor jump lands the target underneath it
+       and the reader arrives at a heading they cannot see. Lenis offsets its
+       own scrolling, but Lenis is not there for a reader who asked for reduced
+       motion, has scripting off, or followed a `#section` link straight from a
+       search result — and those are exactly the readers who cannot recover by
+       nudging the wheel. The value clears the 66px band with room to breathe. */
+    scroll-padding-top: 88px;
   }
 
   body {
@@ -352,7 +387,7 @@
   }
 
   a:hover {
-    color: var(--color-accent-600);
+    color: var(--color-accent-hover);
   }
 
   img {
@@ -364,9 +399,18 @@
     outline: none;
   }
 
+  /* Two rings, not one.
+     An accent outline disappears the moment the focused thing sits on an
+     accent field — the primary button, the full-screen menu, the "next case"
+     card, the skip link itself — and those are all keyboard targets. The inner
+     ring is the page ground, filling the outline's own offset, so one of the
+     two is always the opposite of whatever is behind it. Together they clear
+     the 3:1 that WCAG 1.4.11 asks of a focus indicator on every ground the
+     design has. */
   :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--color-bg);
   }
 
   ::selection {
@@ -465,5 +509,66 @@
 
   [data-stagger-item] {
     opacity: 0;
+  }
+
+  /* ────────────────────────────────────────────────────────────────────────
+     First paint — the hero animates here, not in GSAP.
+
+     Everything above waits for GSAP to reveal it, which is correct for content
+     the reader has to scroll to: by the time it is on screen the script has
+     long since arrived. It is wrong for the hero. The hero is on screen at the
+     first paint, so hiding it until hydration makes the browser's Largest
+     Contentful Paint the moment the JavaScript bundle finishes — the hero
+     paragraph measured 3.5s that way, most of it spent waiting rather than
+     drawing, and Largest Contentful Paint is a ranking signal as well as a
+     number in a report.
+
+     A CSS animation starts on the first frame the element is painted, with no
+     script involved at all, so the same entrance now costs nothing to arrive.
+     `both` holds the opening frame before the delay elapses, which is what
+     keeps the pre-paint state honest: the element is still invisible until its
+     beat, it is just invisible for a tenth of the time.
+
+     Every number below is set by the component from `lib/motion/tokens.ts` —
+     these rules only say which property moves, never how far or how fast. The
+     GSAP effect on these elements is skipped, so nothing animates twice.
+     ──────────────────────────────────────────────────────────────────────── */
+
+  [data-reveal="load"] {
+    animation: reveal-rise var(--reveal-duration) var(--reveal-ease) var(--reveal-delay) both;
+  }
+
+  [data-split="load"] {
+    visibility: visible;
+  }
+
+  /* The stagger is the line's own index times one step, so the lines climb in
+     the order they read rather than together. */
+  [data-split="load"] [data-split-line] {
+    animation: split-rise var(--split-duration) var(--split-ease)
+      calc(var(--split-delay) + var(--split-index) * var(--split-stagger)) both;
+  }
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    translate: var(--reveal-from-x) var(--reveal-from-y);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* A percentage in `translate` resolves against the element's own height, which
+   is exactly what GSAP's `yPercent` means — so the line starts the same
+   distance below its mask either way. */
+@keyframes split-rise {
+  from {
+    translate: 0 var(--split-from-y);
+  }
+  to {
+    translate: 0 0;
   }
 }
