@@ -51,11 +51,27 @@ export function CasesTrack({
           scrub: CASES.scrub,
           invalidateOnRefresh: true,
           anticipatePin: CASES.anticipatePin,
+          /* `scaleX` rather than `width`: a width written on every scroll frame
+             lays out and repaints the bar, on the same frames the track is
+             already asking for a composite. A transform on a `left` origin is
+             the same picture for the compositor alone. */
           onUpdate: (self) => {
-            if (progress) progress.style.width = `${self.progress * 100}%`;
+            if (progress) progress.style.transform = `scaleX(${self.progress})`;
+          },
+          /* Promote the track for as long as the pin owns the section, and let
+             it go again afterwards. Its layer is then ready before the first
+             scrubbed frame rather than being built during it, which is the
+             hitch on the way in, and it does not hold memory for the rest of
+             the page. */
+          onToggle: (self) => {
+            track.style.willChange = self.isActive ? "transform" : "auto";
           },
         },
       });
+
+      return () => {
+        track.style.willChange = "";
+      };
     });
 
     // Slow push-in on the card being pointed at, with the print draining to
@@ -71,22 +87,45 @@ export function CasesTrack({
       // empty string and GSAP would have no start value to interpolate from.
       gsap.set(image, { [CASES.hover.color.property]: CASES.hover.color.from });
 
-      const hover = (scale: number, grayscale: number) => () => {
-        gsap.to(image, { scale, duration: CASES.hover.duration, ease: CASES.hover.ease });
+      /* A scaling photograph under a `filter` is the most expensive thing in
+         the section: the filter has to be re-rasterised at every step of the
+         push-in, and the colour drain moves the filter itself. Promoting the
+         frame for the length of the hover keeps that off the main thread's
+         critical path, and it is released once the pointer has left so a row of
+         parked cards does not each hold a layer.
+
+         `overwrite: "auto"` because a pointer crossing cards quickly would
+         otherwise leave the enter and leave tweens of one frame fighting over
+         the same two properties. */
+      const hover = (scale: number, grayscale: number, settled: string) => () => {
+        image.style.willChange = "transform, filter";
+        gsap.to(image, {
+          scale,
+          duration: CASES.hover.duration,
+          ease: CASES.hover.ease,
+          overwrite: "auto",
+          // The longer of the two tweens, so this is where the frame is done
+          // moving. Held while the pointer stays, dropped once it has left.
+          onComplete: () => {
+            image.style.willChange = settled;
+          },
+        });
         gsap.to(image, {
           [CASES.hover.color.property]: grayscale,
           duration: CASES.hover.color.duration,
           ease: CASES.hover.color.ease,
+          overwrite: "auto",
         });
       };
-      const enter = hover(CASES.hover.scale, CASES.hover.color.to);
-      const leave = hover(1, CASES.hover.color.from);
+      const enter = hover(CASES.hover.scale, CASES.hover.color.to, "transform, filter");
+      const leave = hover(1, CASES.hover.color.from, "auto");
 
       card.addEventListener("mouseenter", enter);
       card.addEventListener("mouseleave", leave);
       teardown.push(() => {
         card.removeEventListener("mouseenter", enter);
         card.removeEventListener("mouseleave", leave);
+        image.style.willChange = "";
       });
     });
 
@@ -114,7 +153,17 @@ export function CasesTrack({
         </div>
 
         <div className="mx-edge mt-cases-prog h-0.75 bg-text/14">
-          <div data-cases-progress className="h-full w-0 bg-accent" />
+          {/* Full width, scaled down to nothing: `onUpdate` drives `scaleX`, so
+              the resting state has to be expressed the same way. The transform
+              is inline rather than a `scale-x-0` class because Tailwind v4
+              writes the `scale` property, which would compose with the
+              `transform` GSAP's scroll handler writes instead of replacing it,
+              and the bar would never appear. */}
+          <div
+            data-cases-progress
+            className="h-full w-full origin-left bg-accent"
+            style={{ transform: "scaleX(0)" }}
+          />
         </div>
       </div>
     </section>

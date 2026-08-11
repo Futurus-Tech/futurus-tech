@@ -108,7 +108,7 @@ The decision is echoed on the response as `x-locale` / `x-locale-reason` for deb
 
 ## Deliberate departures from the design file
 
-The port is otherwise value-for-value. Three places where it isn't:
+The port is otherwise value-for-value. Four places where it isn't:
 
 - **Language switching** is routing rather than a runtime `textContent` swap, which is what allows
   the sections to stay on the server and the previews to be language-correct.
@@ -117,6 +117,10 @@ The port is otherwise value-for-value. Three places where it isn't:
   the title instead.
 - **Case cards below 760px.** The design disables the horizontal gallery there and the cards past
   the fold become unreachable. Here the track becomes a plain horizontal scroller.
+- **The case gallery's scrub and travel.** The design's `scrub: 1.1` and 1.25 scroll-to-travel
+  ratio assumed native scrolling. Under Lenis they smooth an already-smoothed position and move the
+  track slower than the wheel, which reads as lag on the way in, through and out. `CASES` in
+  `lib/motion/tokens.ts` carries the retuned values and the reasoning.
 
 ## Placeholder assets
 

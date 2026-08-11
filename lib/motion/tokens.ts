@@ -184,13 +184,24 @@ export const PROCESS_PROGRESS = {
 /** Cases — horizontal pinned gallery. */
 export const CASES = {
   ease: EASE.none,
-  scrub: 1.1,
+  /**
+   * The design's 1.1 assumed native scrolling. Lenis already smooths the
+   * position this reads (lerp 0.075), so a scrub that long smooths a smoothed
+   * signal: the track keeps travelling for over a second after the wheel stops
+   * and the whole section feels like it is dragging behind the page. 0.55 is
+   * enough to absorb wheel steps without adding a second layer of easing.
+   */
+  scrub: 0.55,
   anticipatePin: 1,
   start: "top top",
   /** Trailing slack past the last card, as a fraction of the viewport height. */
-  endViewportFactor: 0.5,
-  /** Scroll distance per pixel of horizontal travel. */
-  endDistanceFactor: 1.25,
+  endViewportFactor: 0.25,
+  /**
+   * Scroll distance per pixel of horizontal travel. At 1 the track moves with
+   * the scroll; above it the cards move slower than the wheel for the section's
+   * entire length, which is the other half of what read as lag.
+   */
+  endDistanceFactor: 1,
   /** Right-hand breathing room kept past the final card. */
   trailingGap: 48,
   /** Below this width the gallery stacks and the pin is skipped entirely. */

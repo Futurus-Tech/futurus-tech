@@ -3,7 +3,7 @@
 import Lenis from "lenis";
 import { useEffect } from "react";
 
-import { ScrollTrigger, prefersReducedMotion } from "@/lib/motion/gsap";
+import { ScrollTrigger, gsap, prefersReducedMotion } from "@/lib/motion/gsap";
 import { registerLenis } from "@/lib/motion/scroll-lock";
 import { SMOOTH_SCROLL } from "@/lib/motion/tokens";
 
@@ -11,7 +11,7 @@ import { SMOOTH_SCROLL } from "@/lib/motion/tokens";
  * Lenis smooth scrolling, wired to ScrollTrigger.
  *
  * Three jobs, all of which have to happen exactly once for the whole page:
- *  1. drive Lenis from a single rAF loop;
+ *  1. drive Lenis from GSAP's ticker, so scroll and tweens share one loop;
  *  2. tell ScrollTrigger to re-measure on every Lenis frame, otherwise pinned
  *     sections drift away from the smoothed scroll position;
  *  3. take over in-page anchor jumps, resolving the target from its live rect
@@ -34,10 +34,21 @@ export function SmoothScroll() {
 
     registerLenis(lenis);
 
-    let frame = requestAnimationFrame(function loop(time) {
-      lenis.raf(time);
-      frame = requestAnimationFrame(loop);
-    });
+    /* Lenis rides GSAP's ticker rather than a rAF loop of its own.
+
+       Two independent rAF loops resolve in registration order, so Lenis would
+       write a new scroll position in one callback and every scrubbed tween
+       would render the *previous* one in the next: a frame of skew that reads
+       as stutter, worst exactly where a pin engages or releases. On one ticker
+       the scroll and the tweens it drives settle in the same frame. GSAP's
+       clock is in seconds, Lenis wants milliseconds.
+
+       `lagSmoothing(0)` for the same reason: after a long frame GSAP would
+       otherwise adjust its internal time to hide the gap, which desynchronises
+       it from a scroll position Lenis did not adjust. */
+    const tick = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(tick);
+    gsap.ticker.lagSmoothing(0);
 
     const update = () => ScrollTrigger.update();
     lenis.on("scroll", update);
@@ -75,7 +86,10 @@ export function SmoothScroll() {
     return () => {
       document.removeEventListener("click", onAnchorClick);
       window.removeEventListener("load", onLoad);
-      cancelAnimationFrame(frame);
+      gsap.ticker.remove(tick);
+      // GSAP's documented defaults, restored so unmounting this does not leave
+      // the rest of the page's motion without lag smoothing.
+      gsap.ticker.lagSmoothing(500, 33);
       registerLenis(null);
       lenis.destroy();
     };
